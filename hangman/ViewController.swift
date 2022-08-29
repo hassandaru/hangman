@@ -33,7 +33,7 @@ class ViewController: UIViewController {
     
     override func loadView() {
         super.loadView()
-        
+        //complete loading words and hints
         performSelector(inBackground: #selector(loadWordsAndHintsInArray), with: nil)
         viewSetup()
     }
