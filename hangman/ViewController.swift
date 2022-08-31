@@ -27,12 +27,17 @@ class ViewController: UIViewController {
     //actual computations and processing words
     var selectedWord = ""
     var selectedHint = ""
-    var numberOfAttempts = 0
+    var numberOfAttempts = 0 {
+        didSet {
+            attempts.text = "\(numberOfAttempts)/7"
+            hangmanImageView.image = UIImage(named: "img\(numberOfAttempts).png")
+        }
+    }
     var allWords =  [String]()
     var allHints = [String]()
-    var correctlyGuessedAlphabetsArray = "" {
+    var correctlyGuessedAlphabetsArray = [Character]() {
         didSet {
-//            correctlyGuessedAlphabetsLabel.text = correctlyGuessedAlphabetsArray
+            correctlyGuessedAlphabetsLabel.text = String(correctlyGuessedAlphabetsArray)
         }
     }
 //    var viewableAlphabetsArray = [String]()
@@ -48,9 +53,8 @@ class ViewController: UIViewController {
 
         loadWordsAndHintsInArray()
         
-        selectWord()
-//        performSelector(inBackground: #selector(selectWord), with: nil)
-
+        StartTheGame()
+        
         updateView()
     }
     
@@ -145,7 +149,7 @@ class ViewController: UIViewController {
         outcome.font = UIFont.systemFont(ofSize: 24)
         
         hangmanImage = UIImage()
-        hangmanImage = UIImage(named: "img1.png")
+        hangmanImage = UIImage(named: "img0.png")
         
         hangmanImageView = UIImageView(image: hangmanImage)
         hangmanImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -333,8 +337,8 @@ class ViewController: UIViewController {
             correctlyGuessedAlphabetsArray.append("-")
 
         }
-        print("correctlyGuessedAlphabetsArray = \(correctlyGuessedAlphabetsArray)")
-        correctlyGuessedAlphabetsLabel.text = correctlyGuessedAlphabetsArray
+//        print("correctlyGuessedAlphabetsArray = \(correctlyGuessedAlphabetsArray)")
+        correctlyGuessedAlphabetsLabel.text = String(correctlyGuessedAlphabetsArray)
         
     }
     
@@ -364,20 +368,83 @@ class ViewController: UIViewController {
     
     @objc func alphabetTapped(_ sender: UIButton) {
         guard let buttonTitle = sender.titleLabel?.text else { return }
+        if (selectedWord.contains(Character(buttonTitle))) {
+            
+            comment.backgroundColor = .systemMint
+            comment.text = "Good Guess"
+            //do as such that the label for guessed is properly showing
+            for (index, item) in selectedWord.enumerated() {
+                if item  == Character(buttonTitle) {
+                    correctlyGuessedAlphabetsArray[index] = Character(buttonTitle)
+                }
+//                print(correctlyGuessedAlphabetsArray)
+            }
+            //checking if the word is now guessed
+            if selectedWord == String(correctlyGuessedAlphabetsArray) {
+                outcome.textColor = .systemCyan
+                outcome.text = "YOU WON ! Congrats"
+                //UIALert here
+                let ac = UIAlertController(title: "You Won!", message: "Congrats! Good Effort", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] args in
+                    self?.StartTheGame()
+                    
+                })
+                
+                present(ac, animated: true)
+                return
+            }
+            
+            
+            sender.isHidden = true
+            return
+        }
+        //if the attempt is wrong and if attempts are finished call give up and reset
         
-        sender.isHidden = true
+        numberOfAttempts += 1
+//        print(numberOfAttempts)
+        if numberOfAttempts == 7 {
+            outcome.text = "YOU LOST!!"
+            
+            let ac = UIAlertController(title: "You Lost!", message: "Sorry, try again. Good Attempt though", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] args in
+                self?.StartTheGame()
+            })
+            present(ac, animated: true)
+            return
+        }
+        else {
+            //do the things if it is wrong.
+            comment.text = "TRY AGAIN"
+            comment.backgroundColor = .systemRed
+            sender.isHidden = true
+
+        }
     }
     
-    @objc func giveUpAction(_ sender: UIButton) {
+    @objc func giveUpAction(_ sender: UIButton! = nil) {
         //will show the word. change the image and then 2 second delay restart the game and call StartSetup
-        numberOfAttempts = 0
-        comment.text = "INCORRECT"
         outcome.text = "You gave up! Better luck next time."
-        attempts.text = "7/7"
+        let ac = UIAlertController(title: "Player defeated", message: "Sorry, try again. Good Attempt though", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] args in
+            self?.StartTheGame()
+        })
+        present(ac, animated: true)
+        return
+
+    }
+    
+    func StartTheGame() {
+        numberOfAttempts = 0
+        comment.text = ""
+        comment.backgroundColor = .systemGray2
+        outcome.text = ""
+        hintLabel.text = ""
+        correctlyGuessedAlphabetsArray = []
         
-        //now show all the buttons
-        showAllButtons()
+        
         selectWord()
+        showAllButtons()
+
     }
 
     @objc func showHintAction(_ sender: UIButton) {
@@ -389,6 +456,7 @@ class ViewController: UIViewController {
 
     @objc func startAgainAction(_ sender: UIButton) {
         //will show the word. change the image and then 2 second delay restart the game and call StartSetup
+        StartTheGame()
     }
 
     

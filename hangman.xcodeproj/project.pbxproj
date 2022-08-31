@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E74210328BF89AF003CE6FA /* img0.png in Resources */ = {isa = PBXBuildFile; fileRef = 7E74210228BF89AF003CE6FA /* img0.png */; };
 		7EBAF8A728BC59D600A86648 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBAF8A628BC59D600A86648 /* AppDelegate.swift */; };
 		7EBAF8A928BC59D600A86648 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBAF8A828BC59D600A86648 /* SceneDelegate.swift */; };
 		7EBAF8AB28BC59D600A86648 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBAF8AA28BC59D600A86648 /* ViewController.swift */; };
@@ -20,11 +21,11 @@
 		7EBAF8D728BCD61400A86648 /* img4.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EBAF8CF28BCD61300A86648 /* img4.png */; };
 		7EBAF8D828BCD61400A86648 /* img1.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EBAF8D028BCD61300A86648 /* img1.png */; };
 		7EBAF8D928BCD61400A86648 /* img7.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EBAF8D128BCD61300A86648 /* img7.png */; };
-		7EBAF8DA28BCD61400A86648 /* img8.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EBAF8D228BCD61300A86648 /* img8.png */; };
 		7EBAF8DB28BCD61400A86648 /* img3.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EBAF8D328BCD61300A86648 /* img3.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7E74210228BF89AF003CE6FA /* img0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = img0.png; sourceTree = "<group>"; };
 		7EBAF8A328BC59D600A86648 /* hangman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hangman.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EBAF8A628BC59D600A86648 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7EBAF8A828BC59D600A86648 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -40,7 +41,6 @@
 		7EBAF8CF28BCD61300A86648 /* img4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = img4.png; path = ../../hangmanImages/img4.png; sourceTree = "<group>"; };
 		7EBAF8D028BCD61300A86648 /* img1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = img1.png; path = ../../hangmanImages/img1.png; sourceTree = "<group>"; };
 		7EBAF8D128BCD61300A86648 /* img7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = img7.png; path = ../../hangmanImages/img7.png; sourceTree = "<group>"; };
-		7EBAF8D228BCD61300A86648 /* img8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = img8.png; path = ../../hangmanImages/img8.png; sourceTree = "<group>"; };
 		7EBAF8D328BCD61300A86648 /* img3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = img3.png; path = ../../hangmanImages/img3.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -83,12 +83,12 @@
 				7EBAF8CA28BC723B00A86648 /* words.txt */,
 				7EBAF8D028BCD61300A86648 /* img1.png */,
 				7EBAF8CC28BCD61300A86648 /* img2.png */,
+				7E74210228BF89AF003CE6FA /* img0.png */,
 				7EBAF8D328BCD61300A86648 /* img3.png */,
 				7EBAF8CF28BCD61300A86648 /* img4.png */,
 				7EBAF8CD28BCD61300A86648 /* img5.png */,
 				7EBAF8CE28BCD61300A86648 /* img6.png */,
 				7EBAF8D128BCD61300A86648 /* img7.png */,
-				7EBAF8D228BCD61300A86648 /* img8.png */,
 				7EBAF8B428BC59DE00A86648 /* Info.plist */,
 			);
 			path = hangman;
@@ -159,8 +159,8 @@
 				7EBAF8D428BCD61400A86648 /* img2.png in Resources */,
 				7EBAF8B028BC59DE00A86648 /* Assets.xcassets in Resources */,
 				7EBAF8D728BCD61400A86648 /* img4.png in Resources */,
-				7EBAF8DA28BCD61400A86648 /* img8.png in Resources */,
 				7EBAF8AE28BC59D700A86648 /* Main.storyboard in Resources */,
+				7E74210328BF89AF003CE6FA /* img0.png in Resources */,
 				7EBAF8CB28BC723B00A86648 /* words.txt in Resources */,
 				7EBAF8D528BCD61400A86648 /* img5.png in Resources */,
 				7EBAF8DB28BCD61400A86648 /* img3.png in Resources */,
