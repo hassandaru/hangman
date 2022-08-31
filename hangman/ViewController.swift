@@ -9,35 +9,49 @@ import UIKit
 
 class ViewController: UIViewController {
     let letters = [ "A", "B", "C", "D", "E", "F","G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U" , "V", "W", "X", "Y", "Z"]
-    var letterButtons = [UIButton]()
+    var alphabetButtons = [UIButton]()
     var gameTitle: UILabel!
     var attempts: UILabel! //0/7
     var guessed: UILabel!
     var hintLabel: UILabel!
     var correctlyGuessedAlphabetsLabel: UILabel!
+    var wordToGuess = ""
     var outcome: UILabel!
     var comment: UILabel!
     var hangmanImage: UIImage!
     var hangmanImageView: UIImageView!
-    var correctlyGuessedAlphabetsArray = [String]() {
-        didSet {
-            correctlyGuessedAlphabetsLabel.text = correctlyGuessedAlphabetsArray.joined()
-        }
-    }
-    var viewableAlphabetsArray = [String]()
     var giveUp: UIButton!
     var showHint: UIButton!
     var startAgain: UIButton!
     
+    //actual computations and processing words
     var selectedWord = ""
+    var selectedHint = ""
+    var numberOfAttempts = 0
     var allWords =  [String]()
     var allHints = [String]()
+    var correctlyGuessedAlphabetsArray = "" {
+        didSet {
+//            correctlyGuessedAlphabetsLabel.text = correctlyGuessedAlphabetsArray
+        }
+    }
+//    var viewableAlphabetsArray = [String]()
+   
+    
+  
     
     override func loadView() {
         super.loadView()
         //complete loading words and hints
-        performSelector(inBackground: #selector(loadWordsAndHintsInArray), with: nil)
+//        performSelector(inBackground: #selector(loadWordsAndHintsInArray), with: nil)
         viewSetup()
+
+        loadWordsAndHintsInArray()
+        
+        selectWord()
+//        performSelector(inBackground: #selector(selectWord), with: nil)
+
+        updateView()
     }
     
     override func viewDidLoad() {
@@ -46,7 +60,6 @@ class ViewController: UIViewController {
     }
     
     @objc func loadWordsAndHintsInArray() {
-        print("did come here")
         if let wordsFile = Bundle.main.url(forResource: "words", withExtension: "txt") {
             if let wordsString = try? String(contentsOf: wordsFile) {
                 let wordsAndHint = wordsString.components(separatedBy: "\n")
@@ -57,10 +70,7 @@ class ViewController: UIViewController {
                     allWords.append(parts[0])
                     allHints.append(parts[1].trimmingCharacters(in: .whitespacesAndNewlines))
                 }
-                print("did come here2")
                 
-                print(allWords)
-                print(allHints)
                 
             }
             else {
@@ -87,7 +97,6 @@ class ViewController: UIViewController {
         let guessAndHintView = UIView()
         guessAndHintView.translatesAutoresizingMaskIntoConstraints = false
         guessAndHintView.backgroundColor = .systemGray2
-        view.addSubview(guessAndHintView)
         
         
         //correctly guessed alphabets
@@ -97,7 +106,6 @@ class ViewController: UIViewController {
         correctlyGuessedAlphabetsLabel.font = UIFont.systemFont(ofSize: 44)
         correctlyGuessedAlphabetsLabel.text = "_ _ _ _ _ _ _ _ _ _"
         correctlyGuessedAlphabetsLabel.textAlignment = .center
-        guessAndHintView.addSubview(correctlyGuessedAlphabetsLabel)
         
         hintLabel = UILabel()
         hintLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -106,14 +114,13 @@ class ViewController: UIViewController {
         hintLabel.textAlignment = .left
         hintLabel.text = "HINT TEXT if it works if it works if it works if it works if it works check if it works if it works if it works"
         
-        guessAndHintView.addSubview(hintLabel)
+      
         
         //comment and outcome and tries on the left
         //image on the right
         let imgAndOtherLabels = UIView()
         imgAndOtherLabels.translatesAutoresizingMaskIntoConstraints = false
         imgAndOtherLabels.backgroundColor = .systemGray2
-        view.addSubview(imgAndOtherLabels)
         
         attempts = UILabel()
         attempts.translatesAutoresizingMaskIntoConstraints = false
@@ -122,7 +129,6 @@ class ViewController: UIViewController {
         attempts.textColor = .white
         attempts.text = "0/7"
         attempts.font = UIFont.systemFont(ofSize: 44)
-        imgAndOtherLabels.addSubview(attempts)
         
         comment = UILabel()
         comment.translatesAutoresizingMaskIntoConstraints = false
@@ -130,7 +136,6 @@ class ViewController: UIViewController {
         comment.backgroundColor = .systemGray
         comment.text = "CORRECT !!!/ TRY AGAIN !!!"
         comment.font = UIFont.systemFont(ofSize: 24)
-        imgAndOtherLabels.addSubview(comment)
         
         outcome = UILabel()
         outcome.translatesAutoresizingMaskIntoConstraints = false
@@ -138,7 +143,6 @@ class ViewController: UIViewController {
         outcome.backgroundColor = .systemGray
         outcome.text = "OUTCOME"
         outcome.font = UIFont.systemFont(ofSize: 24)
-        imgAndOtherLabels.addSubview(outcome)
         
         hangmanImage = UIImage()
         hangmanImage = UIImage(named: "img1.png")
@@ -147,11 +151,22 @@ class ViewController: UIViewController {
         hangmanImageView.translatesAutoresizingMaskIntoConstraints = false
         //        hangmanImageView.sizeToFit()
         
-        imgAndOtherLabels.addSubview(hangmanImageView)
+   
         
         let alphabetView = UIView()
         alphabetView.translatesAutoresizingMaskIntoConstraints = false
         alphabetView.backgroundColor = .systemGray2
+        
+        view.addSubview(guessAndHintView)
+        guessAndHintView.addSubview(correctlyGuessedAlphabetsLabel)
+        guessAndHintView.addSubview(hintLabel)
+
+        view.addSubview(imgAndOtherLabels)
+        imgAndOtherLabels.addSubview(attempts)
+        imgAndOtherLabels.addSubview(comment)
+        imgAndOtherLabels.addSubview(outcome)
+        imgAndOtherLabels.addSubview(hangmanImageView)
+
         view.addSubview(alphabetView)
         
         let btnWidth = 50
@@ -184,19 +199,19 @@ class ViewController: UIViewController {
                     // add it to the buttons view
                     alphabetView.addSubview(alphabetButton)
                     
-                    // and also to our letterButtons array
-                    letterButtons.append(alphabetButton)
+                    // and also to our alphabetButtons array
+                    alphabetButtons.append(alphabetButton)
                     alphabetCounter += 1
 
                 }
             }
-        print(letterButtons.count)
         
         giveUp = UIButton()
         giveUp.translatesAutoresizingMaskIntoConstraints = false
         giveUp.backgroundColor = .systemGray2
         giveUp.layer.borderColor = UIColor.gray.cgColor
         giveUp.layer.borderWidth = 1
+        giveUp.addTarget(self, action: #selector(giveUpAction), for: .touchUpInside)
         giveUp.setTitle("GIVE UP", for: .normal)
         
         showHint = UIButton()
@@ -204,6 +219,7 @@ class ViewController: UIViewController {
         showHint.backgroundColor = .systemGray2
         showHint.layer.borderColor = UIColor.gray.cgColor
         showHint.layer.borderWidth = 1
+        showHint.addTarget(self, action: #selector(showHintAction), for: .touchUpInside)
         showHint.setTitle("SHOW HINT", for: .normal)
         
         
@@ -212,6 +228,8 @@ class ViewController: UIViewController {
         startAgain.backgroundColor = .systemGray2
         startAgain.layer.borderColor = UIColor.gray.cgColor
         startAgain.layer.borderWidth = 1
+        startAgain.addTarget(self, action: #selector(startAgainAction), for: .touchUpInside)
+
         startAgain.setTitle("START AGAIN", for: .normal)
         
         
@@ -241,19 +259,19 @@ class ViewController: UIViewController {
             //            //correctlyGuessedLabel and hintLabel inside guessAndHintView
             correctlyGuessedAlphabetsLabel.topAnchor.constraint(equalTo: guessAndHintView.topAnchor, constant: 10),
             correctlyGuessedAlphabetsLabel.leadingAnchor.constraint(equalTo: guessAndHintView.leadingAnchor, constant: 10),
-            correctlyGuessedAlphabetsLabel.trailingAnchor.constraint(equalTo: guessAndHintView.trailingAnchor, constant: 10),
+            correctlyGuessedAlphabetsLabel.trailingAnchor.constraint(equalTo: guessAndHintView.trailingAnchor),
             
             correctlyGuessedAlphabetsLabel.widthAnchor.constraint(equalTo: guessAndHintView.widthAnchor, constant: -10),
             correctlyGuessedAlphabetsLabel.heightAnchor.constraint(equalToConstant: 60),
             
             hintLabel.topAnchor.constraint(equalTo: correctlyGuessedAlphabetsLabel.bottomAnchor, constant: 10),
             hintLabel.leadingAnchor.constraint(equalTo: guessAndHintView.leadingAnchor, constant: 10),
-            hintLabel.trailingAnchor.constraint(equalTo: guessAndHintView.trailingAnchor, constant: 10),
+            hintLabel.trailingAnchor.constraint(equalTo: guessAndHintView.trailingAnchor),
             
             hintLabel.widthAnchor.constraint(equalTo: guessAndHintView.widthAnchor, constant: -10),
-            hintLabel.heightAnchor.constraint(equalToConstant: 100),
+            hintLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 100),
             hintLabel.bottomAnchor.constraint(greaterThanOrEqualTo: guessAndHintView.bottomAnchor, constant: 10),
-            //
+            
             //            //now setting img and otherlabels
             imgAndOtherLabels.topAnchor.constraint(equalTo: guessAndHintView.bottomAnchor, constant: 10),
             imgAndOtherLabels.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: 100),
@@ -266,12 +284,12 @@ class ViewController: UIViewController {
             attempts.leadingAnchor.constraint(equalTo: imgAndOtherLabels.leadingAnchor, constant: 10),
             attempts.widthAnchor.constraint(equalTo: imgAndOtherLabels.widthAnchor, multiplier: 0.5),
             attempts.heightAnchor.constraint(equalToConstant: 60),
-            
+
             comment.topAnchor.constraint(equalTo: attempts.bottomAnchor, constant: 10),
             comment.leadingAnchor.constraint(equalTo: imgAndOtherLabels.leadingAnchor, constant: 10),
             comment.widthAnchor.constraint(equalTo: attempts.widthAnchor),
             comment.heightAnchor.constraint(equalToConstant: 60),
-            
+
             outcome.topAnchor.constraint(equalTo: comment.bottomAnchor, constant: 10),
             outcome.leadingAnchor.constraint(equalTo: imgAndOtherLabels.leadingAnchor, constant: 10),
             outcome.widthAnchor.constraint(equalTo: attempts.widthAnchor),
@@ -281,34 +299,67 @@ class ViewController: UIViewController {
             hangmanImageView.trailingAnchor.constraint(equalTo: imgAndOtherLabels.trailingAnchor, constant: -10),
             hangmanImageView.widthAnchor.constraint(equalToConstant: 135),
             hangmanImageView.heightAnchor.constraint(equalToConstant: 180),
-            
+//
             alphabetView.topAnchor.constraint(equalTo: imgAndOtherLabels.bottomAnchor, constant: 10),
 //            alphabetView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: 10),
             alphabetView.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor),
             alphabetView.widthAnchor.constraint(equalToConstant: 350),
             alphabetView.heightAnchor.constraint(equalToConstant: 200),
-            
+
             giveUp.topAnchor.constraint(equalTo: alphabetView.bottomAnchor, constant: 10),
             giveUp.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: 10),
-            giveUp.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.3, constant: -10),
-            
+            giveUp.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.33, constant: -10),
+
             showHint.topAnchor.constraint(equalTo: alphabetView.bottomAnchor, constant: 10),
-            showHint.leadingAnchor.constraint(equalTo: giveUp.trailingAnchor),
-            showHint.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.3),
+            showHint.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.33),
             showHint.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor),
-            
+
             startAgain.topAnchor.constraint(equalTo: alphabetView.bottomAnchor, constant: 10),
             startAgain.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -10),
-            startAgain.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.3, constant: -10),
-            
-            
-            
-            
-            
+            startAgain.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.33, constant: -10),
+
             
         ])
         
         
+    }
+    
+    @objc func selectWord() {
+        //select the random word and populate the array.
+        let randomWordIndex = Int.random(in: 0..<allWords.count)
+        selectedWord = allWords[randomWordIndex]
+        selectedHint = allHints[randomWordIndex]
+        for _ in 0..<selectedWord.count  {
+            correctlyGuessedAlphabetsArray.append("-")
+
+        }
+        print("correctlyGuessedAlphabetsArray = \(correctlyGuessedAlphabetsArray)")
+        correctlyGuessedAlphabetsLabel.text = correctlyGuessedAlphabetsArray
+        
+    }
+    
+    @objc func updateView() {
+        //should check if the word is correct. If yes, show the alphabets after updating correctlyGuessed
+        
+        
+        
+        //update attempts, comments and outcome if necessary
+        
+        
+        //update the image if necessary
+        
+        //update the alphabet it necessary
+        
+        
+        
+        
+        
+    }
+    
+    func showAllButtons() {
+        for alphabetButton in alphabetButtons {
+            alphabetButton.isHidden = false
+        }
     }
     
     @objc func alphabetTapped(_ sender: UIButton) {
@@ -316,6 +367,31 @@ class ViewController: UIViewController {
         
         sender.isHidden = true
     }
+    
+    @objc func giveUpAction(_ sender: UIButton) {
+        //will show the word. change the image and then 2 second delay restart the game and call StartSetup
+        numberOfAttempts = 0
+        comment.text = "INCORRECT"
+        outcome.text = "You gave up! Better luck next time."
+        attempts.text = "7/7"
+        
+        //now show all the buttons
+        showAllButtons()
+        selectWord()
+    }
+
+    @objc func showHintAction(_ sender: UIButton) {
+        //will show the word. change the image and then 2 second delay restart the game and call StartSetup
+        
+        hintLabel.text = "Hint: " + selectedHint
+        return
+    }
+
+    @objc func startAgainAction(_ sender: UIButton) {
+        //will show the word. change the image and then 2 second delay restart the game and call StartSetup
+    }
+
+    
     
 }
 
